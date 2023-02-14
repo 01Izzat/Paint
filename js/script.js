@@ -1,27 +1,72 @@
 //================GLOBAL VARIABLES===============//
-const canvas = document.querySelector('canvas')
+const canvas = document.querySelector('canvas'),
+      toolBtns = document.querySelectorAll('.tool'),
+      fillColor = document.querySelector('#fill-color')
 
+//================== VARIABLES ===============//
 let ctx = canvas.getContext('2d'),
-    isDrawing = false
-    brushWidth = 5
+    isDrawing = false,
+    brushWidth = 5,
+    selectedTool = 'brush',
+    prevMouseX,
+    prevMouseY,
+    snapshot
 
+//================SET CANVAS WIDTH AND HEIGHT===============//
 window.addEventListener('load', () => {
   canvas.width = canvas.offsetWidth
   canvas.height = canvas.offsetHeight
 })
 
-const startDraw = () => {
+//================START DRAWING ===============//
+const startDraw = (e) => {
   isDrawing = true
+  prevMouseX = e.offsetX
+  prevMouseY = e.offsetY
   ctx.beginPath()
   ctx.lineWidth = brushWidth
+  snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height)
+};
+
+//================DRAW RECTANGLE===============//
+const drawRectangle = (e) => {
+  fillColor.checked
+  ? ctx.fillRect(e.offsetX, e.offsetY, prevMouseX - e.offsetX, prevMouseY - e.offsetY) 
+  : ctx.strokeRect(e.offsetX, e.offsetY, prevMouseX - e.offsetX, prevMouseY - e.offsetY)
+  
+ 
+   
+  
 }
 
+//================DRAWING===============//
 const drawing = e => {
   if(!isDrawing) return
-  ctx.lineTo(e.offsetX, e.offsetY )
-  ctx.stroke()
+  ctx.putImageData(snapshot, 0, 0)
+
+  switch(selectedTool) {
+    case 'brush':
+      ctx.lineTo(e.offsetX, e.offsetY )
+      ctx.stroke()
+      break
+    case 'rectangle':
+      drawRectangle(e)
+      break
+  }
 }
 
+//================TOOLS BTN===============//
+
+toolBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelector('.options .active').classList.remove('active')
+    btn.classList.add('active')
+    selectedTool = btn.id
+    console.log(selectedTool);
+  })
+})
+
+//================STOP DRAWING===============//
 const stopDraw = () => {
   isDrawing = false
 }
